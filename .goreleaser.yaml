@@ -1,0 +1,82 @@
+version: 2
+
+project_name: devwork
+
+before:
+  hooks:
+    - go mod tidy
+    - mkdir -p completions
+    # Generate shell completions to bundle in the archives.
+    - go run ./cmd/devwork completion bash > completions/devwork.bash
+    - go run ./cmd/devwork completion zsh  > completions/devwork.zsh
+    - go run ./cmd/devwork completion fish > completions/devwork.fish
+
+builds:
+  - id: devwork
+    main: ./cmd/devwork
+    binary: devwork
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+    goos: [darwin, linux, windows]
+    goarch: [amd64, arm64]
+    ignore:
+      - goos: windows
+        goarch: arm64
+
+archives:
+  - id: default
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
+    files:
+      - LICENSE
+      - README.md
+      - completions/*
+      - presets/*
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  use: github
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+
+brews:
+  - name: devwork
+    repository:
+      owner: iampapagray
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    homepage: "https://github.com/iampapagray/devwork"
+    description: "Create a git branch from a tracker issue (Jira, GitHub, GitLab)"
+    license: "MIT"
+    directory: Formula
+    install: |
+      bin.install "devwork"
+      bin.install_symlink bin/"devwork" => "devw"
+      bash_completion.install "completions/devwork.bash" => "devwork"
+      zsh_completion.install "completions/devwork.zsh" => "_devwork"
+      fish_completion.install "completions/devwork.fish"
+    test: |
+      system "#{bin}/devwork", "--version"
+
+release:
+  github:
+    owner: iampapagray
+    name: devwork
+  draft: false

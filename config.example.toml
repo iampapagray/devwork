@@ -1,0 +1,18 @@
+# devwork global config — copy to ~/.config/devwork/config.toml (chmod 0600).
+# This file holds secrets. Per-repo behavior goes in a committed .devwork.toml.
+
+# default_profile = "work"   # (phase 2) multi-profile selection
+
+[providers.jira]
+base_url = "https://your-org.atlassian.net"
+email    = "you@example.com"
+# Create a token: https://id.atlassian.com/manage-profile/security/api-tokens
+token    = ""   # or set DEVWORK_JIRA_TOKEN
+
+[providers.github]
+# or set DEVWORK_GITHUB_TOKEN / GITHUB_TOKEN, or rely on the gh CLI
+token = ""
+
+[providers.gitlab]
+base_url = "https://gitlab.com"
+token    = ""   # or set DEVWORK_GITLAB_TOKEN

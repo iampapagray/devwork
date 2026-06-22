@@ -1,0 +1,20 @@
+# jira-strict preset — reproduces the original bash script's behavior.
+#
+# Copy into a repo as .devwork.toml (or merge the relevant keys). Branch format:
+#   v{version}/{ISSUE-KEY}_{slug}   e.g. v7.3/QA-2840_alert-followups
+#
+# The version gate is ON (template uses {version}); the issue's fix version is
+# the branch prefix, and a fix version older than the repo's package.json is a
+# hard abort (mismatch = "strict").
+
+provider    = "jira"
+template    = "v{version}/{key}_{slug}"
+base_branch = ""                       # empty = branch from the current branch
+
+[version]
+source   = "package.json"              # read MAJOR.MINOR from .version
+mismatch  = "strict"                   # behind/incompatible issue version -> abort
+
+[slug]
+max_words = 6
+max_chars = 50
