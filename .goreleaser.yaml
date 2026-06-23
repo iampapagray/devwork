@@ -6,10 +6,12 @@ before:
   hooks:
     - go mod tidy
     - mkdir -p completions
-    # Generate shell completions to bundle in the archives.
-    - go run ./cmd/devwork completion bash > completions/devwork.bash
-    - go run ./cmd/devwork completion zsh  > completions/devwork.zsh
-    - go run ./cmd/devwork completion fish > completions/devwork.fish
+    # Generate shell completions to bundle in the archives. These are wrapped in
+    # `sh -c` because GoReleaser runs hooks without a shell, so the `>`
+    # redirection would otherwise be passed as a literal argument.
+    - sh -c "go run ./cmd/devwork completion bash > completions/devwork.bash"
+    - sh -c "go run ./cmd/devwork completion zsh > completions/devwork.zsh"
+    - sh -c "go run ./cmd/devwork completion fish > completions/devwork.fish"
 
 builds:
   - id: devwork
