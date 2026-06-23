@@ -56,24 +56,33 @@ changelog:
       - "^test:"
       - "^chore:"
 
-brews:
+# Homebrew support moved from formulae (`brews`) to casks in GoReleaser v2.
+homebrew_casks:
   - name: devwork
     repository:
       owner: iampapagray
       name: homebrew-tap
+      branch: main
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
     homepage: "https://github.com/iampapagray/devwork"
     description: "Create a git branch from a tracker issue (Jira, GitHub, GitLab)"
-    license: "MIT"
-    directory: Formula
-    install: |
-      bin.install "devwork"
-      bin.install_symlink bin/"devwork" => "devw"
-      bash_completion.install "completions/devwork.bash" => "devwork"
-      zsh_completion.install "completions/devwork.zsh" => "_devwork"
-      fish_completion.install "completions/devwork.fish"
-    test: |
-      system "#{bin}/devwork", "--version"
+    directory: Casks
+    binaries:
+      - devwork
+    completions:
+      bash: completions/devwork.bash
+      zsh: completions/devwork.zsh
+      fish: completions/devwork.fish
+    hooks:
+      post:
+        # Symlink the `devw` shorthand next to the installed binary, and clear
+        # the quarantine flag so the unsigned binary runs on macOS.
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/devwork"]
+          end
+          system_command "/bin/ln", args: ["-sf", "#{HOMEBREW_PREFIX}/bin/devwork", "#{HOMEBREW_PREFIX}/bin/devw"]
+    caveats: "A 'devw' shorthand is symlinked to devwork."
 
 release:
   github:

@@ -31,9 +31,11 @@ func (stubProvider) Name() string { return "stub" }
 func (stubProvider) Match(string) provider.MatchResult {
 	return provider.MatchResult{Confidence: provider.Strong}
 }
+
 func (stubProvider) Resolve(_ context.Context, in string, _ provider.RepoContext) (issue.IssueRef, error) {
 	return issue.IssueRef{Provider: "stub", Key: strings.ToUpper(in)}, nil
 }
+
 func (stubProvider) Fetch(context.Context, issue.IssueRef, creds.Credentials) (issue.Issue, error) {
 	return issue.Issue{Provider: "stub", Key: "TASK-1", Title: stubTitle, Version: stubVer}, nil
 }

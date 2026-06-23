@@ -20,6 +20,7 @@ func (s stub) Match(in string) provider.MatchResult { return s.match(in) }
 func (s stub) Resolve(context.Context, string, provider.RepoContext) (issue.IssueRef, error) {
 	return issue.IssueRef{Provider: s.name}, nil
 }
+
 func (s stub) Fetch(context.Context, issue.IssueRef, creds.Credentials) (issue.Issue, error) {
 	return issue.Issue{}, nil
 }
@@ -60,10 +61,12 @@ func indexOf(s, sub string) int {
 	}
 	return -1
 }
+
 func matchesKey(s string) bool {
 	dash := indexOf(s, "-")
 	return dash > 0 && dash < len(s)-1 && s[0] >= 'A' && s[0] <= 'Z'
 }
+
 func isNumeric(s string) bool {
 	s = trimHash(s)
 	if s == "" {
@@ -76,6 +79,7 @@ func isNumeric(s string) bool {
 	}
 	return true
 }
+
 func trimHash(s string) string {
 	if len(s) > 0 && s[0] == '#' {
 		return s[1:]

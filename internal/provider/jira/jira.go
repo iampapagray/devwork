@@ -96,16 +96,16 @@ func (p *Provider) Fetch(ctx context.Context, ref issue.IssueRef, c creds.Creden
 	case http.StatusOK:
 		// fall through to parse below
 	case http.StatusUnauthorized, http.StatusForbidden:
-		return issue.Issue{}, fmt.Errorf("Jira auth failed (HTTP %d) — check email/token", resp.StatusCode)
+		return issue.Issue{}, fmt.Errorf("auth to Jira failed (HTTP %d) — check email/token", resp.StatusCode)
 	case http.StatusNotFound:
 		return issue.Issue{}, fmt.Errorf("issue %s not found (HTTP 404)", ref.Key)
 	default:
 		var je jiraError
 		_ = dec.Decode(&je)
 		if len(je.ErrorMessages) > 0 {
-			return issue.Issue{}, fmt.Errorf("Jira returned HTTP %d: %s", resp.StatusCode, strings.Join(je.ErrorMessages, "; "))
+			return issue.Issue{}, fmt.Errorf("unexpected response from Jira (HTTP %d): %s", resp.StatusCode, strings.Join(je.ErrorMessages, "; "))
 		}
-		return issue.Issue{}, fmt.Errorf("Jira returned HTTP %d", resp.StatusCode)
+		return issue.Issue{}, fmt.Errorf("unexpected response from Jira (HTTP %d)", resp.StatusCode)
 	}
 
 	var ji jiraIssue
